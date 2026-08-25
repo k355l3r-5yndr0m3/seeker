@@ -117,6 +117,7 @@ class SeeKerTrainer:
             self.log_writer.add_scalar('NLL Loss', negloglik_loss.item(), epoch )
 
             if self.dataset not in ["ShangaiTech", "MSAD"]:
+                print('WTF')
                 auc_val = self.validate()
                 all_val_auc[epoch] = auc_val
             else:
