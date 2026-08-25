@@ -5,6 +5,8 @@ from tqdm import tqdm
 import math
 from validation import score_anomalies
 
+import wandb
+
 
 class SeeKerTrainer:
     def __init__(self, args, model, train_loader, test_loader, val_loader, val_metadata, test_metadata,
@@ -81,6 +83,17 @@ class SeeKerTrainer:
         self.model.train()
         self.model = self.model.to(self.args.device)
         all_val_auc = {}
+
+        # print(vars(self.args))
+        # exit()
+
+        # start wandb run 
+        # run = wandb.init(
+        #     entity="hoanghung17jan-vu-hoang-hung",
+        #     project="Project",
+        #     config=vars(self.args),
+        # )
+
         for epoch in range(start_epoch, num_epochs):
             self.model.train()
 
@@ -112,6 +125,9 @@ class SeeKerTrainer:
             is_best = auc_val == max(all_val_auc.values(), default=0)
             if is_best:
                 self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
+
+
+        # run.finish()
 
         return auc_val
     

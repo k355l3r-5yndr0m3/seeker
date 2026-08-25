@@ -33,7 +33,7 @@ def main():
     dataset, loader = get_dataset_and_loader(args, only_test=(pretrained is not None))
 
     in_dim = 2*18*args.seg_len
-    model = PartialAutoregressiveFC(dim=in_dim, hidden_dims=args.n_layers*[args.expansion_factor*(in_dim-2)], droppout=args.dropout)
+    model = PartialAutoregressiveFC(dim=in_dim, hidden_dims=args.n_layers*[args.expansion_factor*(in_dim-2)], droppout=args.droppout)
     print(model)
     model.to('cuda')
     writer = SummaryWriter()
