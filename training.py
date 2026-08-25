@@ -122,6 +122,9 @@ class SeeKerTrainer:
                 all_val_auc[epoch] = auc_val
             else:
                 auc_val = 0
+
+            print("AAAA")
+            exit()
             
             is_best = auc_val == max(all_val_auc.values(), default=0)
             if is_best:
