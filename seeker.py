@@ -37,6 +37,7 @@ def main():
     print(model)
     model.to('cuda')
     writer = SummaryWriter()
+    print(args.dataset)
     trainer = SeeKerTrainer(args, model, loader['train'], loader['test'], loader['validate'], 
                                            dataset['validate'].metadata, dataset['test'].metadata,
                       optimizer_f=init_optimizer(args.model_optimizer, lr=args.model_lr),

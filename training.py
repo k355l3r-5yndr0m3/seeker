@@ -88,11 +88,11 @@ class SeeKerTrainer:
         # exit()
 
         # start wandb run 
-        # run = wandb.init(
-        #     entity="hoanghung17jan-vu-hoang-hung",
-        #     project="Project",
-        #     config=vars(self.args),
-        # )
+        run = wandb.init(
+            entity="hoanghung17jan-vu-hoang-hung",
+            project="Project",
+            config=vars(self.args),
+        )
 
         for epoch in range(start_epoch, num_epochs):
             self.model.train()
@@ -117,21 +117,19 @@ class SeeKerTrainer:
             self.log_writer.add_scalar('NLL Loss', negloglik_loss.item(), epoch )
 
             if self.dataset not in ["ShangaiTech", "MSAD"]:
-                print('WTF')
                 auc_val = self.validate()
                 all_val_auc[epoch] = auc_val
             else:
                 auc_val = 0
 
-            print("AAAA")
-            exit()
+            run.log({"auc": auc_val, "loss": negloglik_loss.item(), })
             
             is_best = auc_val == max(all_val_auc.values(), default=0)
             if is_best:
                 self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
 
 
-        # run.finish()
+        run.finish()
 
         return auc_val
     
