@@ -5,7 +5,7 @@ from tqdm import tqdm
 import math
 from validation import score_anomalies
 
-# import wandb
+import wandb
 
 
 class SeeKerTrainer:
