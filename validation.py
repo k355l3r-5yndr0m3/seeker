@@ -115,6 +115,8 @@ def get_scores_in_clip(scores, clip, metadata_np, metadata, per_frame_scores_roo
         for t in range(gt.shape[0]):
             if np.any(gt[t] == 1):
                 clip_gt[t] = 1
+    elif args.dataset == 'UBnormal':
+        clip_gt = 1 - np.load(clip_res_fn) # Because in file (1 = normal; 0 = abnormal)
     else:
         clip_gt = np.load(clip_res_fn)
 
