@@ -64,6 +64,8 @@ class SeeKerTrainer:
         mu = mu.reshape(B, T * N, A)[:, (-N-1):-1]
         logvar = logvar.reshape(B, T * N, A)[:, (-N-1):-1]
 
+        logvar = torch.clamp(logvar, min=-64, max=64)
+
         # Clamp log-variance to avoid numerical overflow/underflow
         # logvar = torch.clamp(logvar, min=-6, max=2) # < new
 
