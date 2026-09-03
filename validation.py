@@ -72,6 +72,7 @@ def get_all_frame_scores(scores, metadata, args=None, split='test', sigma=0):
     for clip in tqdm(clip_list):
         clip_gt, clip_score = get_scores_in_clip(scores, clip, metadata_np, metadata, per_frame_scores_root, args, sigma=sigma)
         if clip_score is not None:
+
             dataset_gt_arr.append(clip_gt)
             dataset_scores_arr.append(clip_score)
 
@@ -91,7 +92,7 @@ def get_all_frame_scores(scores, metadata, args=None, split='test', sigma=0):
 
 def get_scores_in_clip(scores, clip, metadata_np, metadata, per_frame_scores_root, args, sigma=0):
     if args.dataset == 'UBnormal':
-        type, scene_id, clip_id = re.findall('(abnormal|normal)_scene_(\d+)_scenario(.*)_tracks.*', clip)[0]
+        type, scene_id, clip_id = re.findall(r'(abnormal|normal)_scene_(\d+)_scenario(.*)_tracks.*', clip)[0]
         clip_id = type + "_" + clip_id
     elif args.dataset == 'avenue':
         clip_id = int(clip.split('_')[0])
@@ -117,17 +118,18 @@ def get_scores_in_clip(scores, clip, metadata_np, metadata, per_frame_scores_roo
     else:
         clip_gt = np.load(clip_res_fn)
 
+
     scores_zeros = np.ones(clip_gt.shape[0]) * (- np.inf)
     if len(clip_fig_idxs) == 0:
         clip_person_scores_dict = {0: np.copy(scores_zeros)}
     else:
         clip_person_scores_dict = {i: np.copy(scores_zeros) for i in clip_fig_idxs}
 
-    kp_scores_zeros = np.ones((clip_gt.shape[0], 18)) * (- np.inf)
-    if len(clip_fig_idxs) == 0:
-        clip_kp_person_scores_dict = {0: np.copy(kp_scores_zeros)}
-    else:
-        clip_kp_person_scores_dict = {i: np.copy(kp_scores_zeros) for i in clip_fig_idxs}
+    # kp_scores_zeros = np.ones((clip_gt.shape[0], 18)) * (- np.inf)
+    # if len(clip_fig_idxs) == 0:
+    #     clip_kp_person_scores_dict = {0: np.copy(kp_scores_zeros)}
+    # else:
+    #     clip_kp_person_scores_dict = {i: np.copy(kp_scores_zeros) for i in clip_fig_idxs}
         
     final_idx = clip_gt.shape[0]-1
     for person_id in clip_fig_idxs:
@@ -146,16 +148,20 @@ def get_scores_in_clip(scores, clip, metadata_np, metadata, per_frame_scores_roo
         s, pid_frame_inds_ = fill_and_smooth_fw(s_t, pid_frame_inds, args, sigma=sigma, final_idx=final_idx)
 
         clip_person_scores_dict[person_id][pid_frame_inds_] = s
-        clip_kp_person_scores_dict[person_id][pid_frame_inds] = s_t_
+        # clip_kp_person_scores_dict[person_id][pid_frame_inds] = s_t_
 
     clip_ppl_score_arr = np.stack(list(clip_person_scores_dict.values()))
     clip_score = np.amax(clip_ppl_score_arr, axis=0)
 
-    scores_zeros = np.ones(clip_gt.shape[0]) * (- np.inf)
-    if len(clip_fig_idxs) == 0:
-        clip_person_scores_dict = {0: np.copy(scores_zeros)}
-    else:
-        clip_person_scores_dict = {i: np.copy(scores_zeros) for i in clip_fig_idxs}
+    # scores_zeros = np.ones(clip_gt.shape[0]) * (- np.inf)
+    # if len(clip_fig_idxs) == 0:
+    #     clip_person_scores_dict = {0: np.copy(scores_zeros)}
+    # else:
+    #     clip_person_scores_dict = {i: np.copy(scores_zeros) for i in clip_fig_idxs}
+
+    # if type == 'abnormal':
+    #     print(f"{clip_gt} {clip_score}")
+
     return clip_gt, clip_score
 
 

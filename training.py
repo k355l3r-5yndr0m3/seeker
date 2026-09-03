@@ -5,7 +5,7 @@ from tqdm import tqdm
 import math
 from validation import score_anomalies
 
-import wandb
+# import wandb
 
 
 class SeeKerTrainer:
@@ -60,14 +60,15 @@ class SeeKerTrainer:
         out = self.model(x)
 
         mu, logvar = torch.chunk(out, 2, dim=1)
+
         mu = mu.reshape(B, T * N, A)[:, (-N-1):-1]
         logvar = logvar.reshape(B, T * N, A)[:, (-N-1):-1]
 
         # Clamp log-variance to avoid numerical overflow/underflow
-        logvar = torch.clamp(logvar, min=-6, max=2) # < new
+        # logvar = torch.clamp(logvar, min=-6, max=2) # < new
 
-        var = torch.exp(logvar)
-        E_inv = torch.diag_embed(1. / (var + 1e-6)) # numerical stabilizer
+        # var = torch.exp(logvar)
+        E_inv = torch.diag_embed(torch.exp(-logvar))
 
         x = x.reshape(B, T * N, A)
         x_tgt = x[:, -N:]
@@ -76,6 +77,8 @@ class SeeKerTrainer:
             torch.einsum('bti,btij,btj->bt', x_tgt - mu, E_inv, x_tgt - mu)
             + torch.sum(logvar, dim=-1) + x_tgt.shape[-1] * math.log(math.pi * 2))
         
+        # lnp = torch.einsum('bti,btij,btj->bt', x_tgt - mu, E_inv, x_tgt - mu) + torch.sum(logvar, dim=-1) + x_tgt.shape[-1] * math.log(math.pi * 2)
+
         return lnp
     
 
@@ -94,7 +97,10 @@ class SeeKerTrainer:
         run = wandb.init(
             entity="hoanghung17jan-vu-hoang-hung",
             project="Project",
-            config=vars(self.args),
+            config={
+                "name": "latest",
+                **vars(self.args),
+            }
         )
 
         for epoch in range(start_epoch, num_epochs):
@@ -108,7 +114,7 @@ class SeeKerTrainer:
                 
                 lnp = self.joint_lnp(x.float())
 
-                negloglik_loss = - lnp.sum(-1).mean() 
+                negloglik_loss = - lnp.sum(-1).mean()
                 negloglik_loss.backward()
                 
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), clip)
@@ -119,7 +125,7 @@ class SeeKerTrainer:
 
             self.log_writer.add_scalar('NLL Loss', negloglik_loss.item(), epoch )
 
-            if self.dataset not in ["ShangaiTech", "MSAD"]:
+            if self.dataset not in ["ShanghaiTech", "MSAD"]:
                 auc_val = self.validate()
                 all_val_auc[epoch] = auc_val
             else:
@@ -143,12 +149,17 @@ class SeeKerTrainer:
         probs = torch.empty(0).to(self.args.device)
         print("Starting Eval")
         for _, data_arr in enumerate(pbar):
+            # print(data_arr)
+            # exit()
 
             x = torch.permute(data_arr[0], (0,2,3,1))[..., :2]
             x = x.to(self.args.device, non_blocking=True) 
 
             conf = torch.permute(data_arr[0], (0,2,3,1))[..., -1]
-            B, T, N, _ = x.shape    
+            B, T, N, _ = x.shape
+
+            # print(x.shape)
+            # exit()
 
             with torch.no_grad():
                 lnp =  self.joint_lnp(x.float())
@@ -160,6 +171,10 @@ class SeeKerTrainer:
             
             probs = torch.cat((probs, nll), dim=0) # nll is the anomaly score
         anomaly_scores_kp = probs.cpu().detach().numpy().squeeze().copy(order='C')
+
+        # print(anomaly_scores_kp)
+        # print(anomaly_scores_kp.shape)
+        # exit()
 
         auc = score_anomalies(anomaly_scores_kp, self.val_metadata, args=self.args, split='validation')
 
