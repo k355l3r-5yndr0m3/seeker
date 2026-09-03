@@ -100,7 +100,7 @@ class SeeKerTrainer:
             entity="hoanghung17jan-vu-hoang-hung",
             project="Project",
             config={
-                "name": "after removing unnecessary negation",
+                "name": "After fixing UBnormal test/val label",
                 **vars(self.args),
             }
         )
