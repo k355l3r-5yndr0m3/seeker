@@ -100,7 +100,7 @@ class SeeKerTrainer:
             entity="hoanghung17jan-vu-hoang-hung",
             project="Project",
             config={
-                "name": "After fixing UBnormal test/val label",
+                "name": "Final run",
                 **vars(self.args),
             }
         )
@@ -127,7 +127,7 @@ class SeeKerTrainer:
 
             self.log_writer.add_scalar('NLL Loss', negloglik_loss.item(), epoch )
 
-            if self.dataset not in ["ShanghaiTech", "MSAD"]:
+            if self.dataset not in ["ShanghaiTech-IGNORE", "MSAD"]: # NOTE: ShanghaiTech test set == val set
                 auc_val = self.validate()
                 all_val_auc[epoch] = auc_val
             else:
