@@ -75,7 +75,7 @@ class SeeKerTrainer:
         x = x.reshape(B, T * N, A)
         x_tgt = x[:, -N:]
 
-        lnp = -0.5 * (
+        lnp = 0.5 * (
             torch.einsum('bti,btij,btj->bt', x_tgt - mu, E_inv, x_tgt - mu)
             + torch.sum(logvar, dim=-1) + x_tgt.shape[-1] * math.log(math.pi * 2))
         
@@ -116,7 +116,7 @@ class SeeKerTrainer:
                 
                 lnp = self.joint_lnp(x.float())
 
-                negloglik_loss = - lnp.sum(-1).mean()
+                negloglik_loss = lnp.sum(-1).mean()
                 negloglik_loss.backward()
                 
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), clip)
@@ -164,10 +164,10 @@ class SeeKerTrainer:
             # exit()
 
             with torch.no_grad():
-                lnp =  self.joint_lnp(x.float())
+                lnp = self.joint_lnp(x.float())
 
                 pad = torch.randn(B, (T-1)*N).to(self.args.device)
-                nll = - torch.cat((pad, lnp), dim=1)
+                nll = torch.cat((pad, lnp), dim=1)
                 nll = nll.view(B, T,  N) * conf.cuda()
                 nll = nll.flatten(start_dim=1)
             
@@ -201,10 +201,10 @@ class SeeKerTrainer:
             B, T, N, _ = x.shape    
 
             with torch.no_grad():
-                lnp =  self.joint_lnp_full_window(x.float())
+                lnp = self.joint_lnp_full_window(x.float()) # NOTE: does not exist. What the fuck is with this code? 
 
                 pad = torch.randn(B, (T-1)*N).to(self.args.device)
-                nll = - torch.cat((pad, lnp), dim=1)
+                nll = torch.cat((pad, lnp), dim=1)
                 nll = nll.view(B, T,  N) * conf.cuda()
                 nll = nll.flatten(start_dim=1)
                     
