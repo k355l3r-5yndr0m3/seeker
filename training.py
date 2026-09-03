@@ -100,7 +100,7 @@ class SeeKerTrainer:
             entity="hoanghung17jan-vu-hoang-hung",
             project="Project",
             config={
-                "name": "latest",
+                "name": "after removing unnecessary negation",
                 **vars(self.args),
             }
         )
