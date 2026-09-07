@@ -111,12 +111,20 @@ class SeeKerTrainer:
             print("Starting Epoch {} / {}".format(epoch + 1, num_epochs))
             pbar = tqdm(self.train_loader)
             for _, data_arr in enumerate(pbar):
+                # Forward pass
                 x = torch.permute(data_arr[0], (0,2,3,1))[..., :2]
                 x = x.to(self.args.device, non_blocking=True) 
                 
                 lnp = self.joint_lnp(x.float())
 
                 negloglik_loss = lnp.sum(-1).mean()
+
+                # Logging
+                auc = self.validate()
+
+                run.log({ "auc": auc, "loss": negloglik_loss.item(), })
+
+                # Optimizing
                 negloglik_loss.backward()
                 
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), clip)
@@ -127,18 +135,23 @@ class SeeKerTrainer:
 
             self.log_writer.add_scalar('NLL Loss', negloglik_loss.item(), epoch )
 
-            if self.dataset not in ["ShanghaiTech-IGNORE", "MSAD"]: # NOTE: ShanghaiTech test set == val set
-                auc_val = self.validate()
-                all_val_auc[epoch] = auc_val
-            else:
-                auc_val = 0
+            # if self.dataset not in ["ShanghaiTech-IGNORE", "MSAD"]: # NOTE: ShanghaiTech test set == val set
+            #     auc_val = self.validate()
+            #     all_val_auc[epoch] = auc_val
+            # else:
+            #     auc_val = 0
 
-            run.log({"auc": auc_val, "loss": negloglik_loss.item(), })
+            # run.log({"auc": auc_val, "loss": negloglik_loss.item(), })
             
-            is_best = auc_val == max(all_val_auc.values(), default=0)
-            if is_best:
-                self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
+            # is_best = auc_val == max(all_val_auc.values(), default=0)
+            # if is_best:
+            #     self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
 
+            # Foregoing saving
+
+        # Final log
+        if epoch > 0:
+            run.log({ "auc": auc, "loss": negloglik_loss.item(), })
 
         run.finish()
 
