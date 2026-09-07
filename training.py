@@ -100,7 +100,7 @@ class SeeKerTrainer:
             entity="hoanghung17jan-vu-hoang-hung",
             project="Project",
             config={
-                "name": "Final run",
+                "grouping": "Log every update",
                 **vars(self.args),
             }
         )
