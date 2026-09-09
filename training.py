@@ -100,10 +100,13 @@ class SeeKerTrainer:
             entity="hoanghung17jan-vu-hoang-hung",
             project="Project",
             config={
-                "grouping": "Log every update",
+                "grouping": "Log every update, keep max and min",
                 **vars(self.args),
             }
         )
+
+        min_loss = float('inf')
+        max_auc = float('-inf')
 
         for epoch in range(start_epoch, num_epochs):
             self.model.train()
@@ -122,7 +125,10 @@ class SeeKerTrainer:
                 # Logging
                 auc = self.validate()
 
-                run.log({ "auc": auc, "loss": negloglik_loss.item(), })
+                min_loss = min(negloglik_loss.item(), min_loss)
+                max_auc = max(auc, max_auc)
+
+                run.log({ "auc": auc, "loss": negloglik_loss.item(), 'min_loss': min_loss, 'max_auc': max_auc, })
 
                 # Optimizing
                 negloglik_loss.backward()
@@ -151,7 +157,7 @@ class SeeKerTrainer:
 
         # Final log
         if epoch > 0:
-            run.log({ "auc": auc, "loss": negloglik_loss.item(), })
+            run.log({ "auc": auc, "loss": negloglik_loss.item(), 'min_loss': min_loss, 'max_auc': max_auc, })
 
         run.finish()
 
