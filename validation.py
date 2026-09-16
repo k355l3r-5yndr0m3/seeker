@@ -16,10 +16,10 @@ def score_anomalies(scores_kp, metadata, args=None, split='test', ret_gt=False, 
     gt_np = np.concatenate(gt_arr)
     scores_np = np.concatenate(scores_arr)
 
-    auc = score_auc(scores_np, gt_np)
-    if ret_gt:
-        return auc, scores_np, gt_np
-    return auc
+    return score_auc(scores_np, gt_np)
+    # if ret_gt:
+    #     return auc, scores_np, gt_np
+    # return auc
 
 
 def score_auc(scores_np, gt):
@@ -40,7 +40,7 @@ def score_auc(scores_np, gt):
     print("Average Precision: ", avg_precision)
 
     # print("Threshold@TPR=95%: ", threshold_at_target_tpr)
-    return auc
+    return auc, avg_precision, fpr_at_target_tpr
 
 
 

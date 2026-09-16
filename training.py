@@ -123,12 +123,19 @@ class SeeKerTrainer:
                 negloglik_loss = lnp.sum(-1).mean()
 
                 # Logging
-                auc = self.validate()
+                auc, avg_precision, fpr_95 = self.validate()
 
                 min_loss = min(negloglik_loss.item(), min_loss)
                 max_auc = max(auc, max_auc)
 
-                run.log({ "auc": auc, "loss": negloglik_loss.item(), 'min_loss': min_loss, 'max_auc': max_auc, })
+                run.log({
+                    "auc": auc,
+                    "average precision": avg_precision,
+                    "FPR@95": fpr_95,
+                    "loss": negloglik_loss.item(),
+                    'min_loss': min_loss,
+                    'max_auc': max_auc,
+                })
 
                 # Optimizing
                 negloglik_loss.backward()
@@ -197,10 +204,10 @@ class SeeKerTrainer:
         # print(anomaly_scores_kp.shape)
         # exit()
 
-        auc = score_anomalies(anomaly_scores_kp, self.val_metadata, args=self.args, split='validation')
+        return score_anomalies(anomaly_scores_kp, self.val_metadata, args=self.args, split='validation')
 
-        print("AUC on val:", auc)
-        return auc  
+        # print("AUC on val:", auc)
+        # return auc  
     
     
     def test(self, ret_all=False, sigma=0, conf_weighting=True):
@@ -231,13 +238,16 @@ class SeeKerTrainer:
         anomaly_scores_kp = probs.cpu().detach().numpy().squeeze().copy(order='C')
 
 
-        auc, frame_scores, frame_gt = score_anomalies(anomaly_scores_kp, self.test_metadata, args=self.args, split='test', sigma=sigma)
+        print("Check code")
+        exit() # TODO Handle this
+        
+        return score_anomalies(anomaly_scores_kp, self.test_metadata, args=self.args, split='test', sigma=sigma)
 
-        print("AUC on test forward:", auc)
-        if ret_all:
-            return auc, frame_scores, frame_gt
-        else:
-            return auc  
+        # print("AUC on test forward:", auc)
+        # if ret_all:
+        #     return auc, frame_scores, frame_gt
+        # else:
+        #     return auc  
         
 
     
