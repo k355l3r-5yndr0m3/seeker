@@ -231,7 +231,8 @@ class SeeKerTrainer:
             B, T, N, _ = x.shape    
 
             with torch.no_grad():
-                lnp = self.joint_lnp_full_window(x.float()) # NOTE: does not exist. What the fuck is with this code? 
+                # lnp = self.joint_lnp_full_window(x.float()) # NOTE: does not exist. What the fuck is with this code? 
+                lnp = self.joint_lnp(x.float())
 
                 pad = torch.randn(B, (T-1)*N).to(self.args.device)
                 nll = torch.cat((pad, lnp), dim=1)
