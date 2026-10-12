@@ -167,8 +167,8 @@ class SeeKerTrainer:
             # Foregoing saving
 
         # Final log
-        if epoch > 0:
-            run.log({ "auc": auc, "loss": negloglik_loss.item(), 'min_loss': min_loss, 'max_auc': max_auc, })
+        # if epoch > 0:
+        #     run.log({ "auc": auc, "loss": negloglik_loss.item(), 'min_loss': min_loss, 'max_auc': max_auc, })
 
         # run.finish()
 
