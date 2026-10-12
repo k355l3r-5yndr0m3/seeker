@@ -161,8 +161,9 @@ class SeeKerTrainer:
             # run.log({"auc": auc_val, "loss": negloglik_loss.item(), })
             
             # is_best = auc_val == max(all_val_auc.values(), default=0)
-            # if is_best:
-            #     self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
+            is_best = max_auc <= auc
+            if is_best:
+                self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
 
             # Foregoing saving
 
@@ -171,8 +172,6 @@ class SeeKerTrainer:
         #     run.log({ "auc": auc, "loss": negloglik_loss.item(), 'min_loss': min_loss, 'max_auc': max_auc, })
 
         # run.finish()
-
-        return auc_val
     
     def validate(self):
         self.model.eval()
