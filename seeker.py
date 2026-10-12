@@ -59,6 +59,7 @@ def main():
     else:
         trainer.load_checkpoint(pretrained)
         auc_test = trainer.test()
+        print(f"auc_test = {auc_test}")
 
 
 if __name__ == '__main__':
