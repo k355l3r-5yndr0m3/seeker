@@ -105,7 +105,7 @@ class SeeKerTrainer:
         #     }
         # )
 
-        min_loss = float('inf')
+        # min_loss = float('inf')
         max_auc = float('-inf')
 
         for epoch in range(start_epoch, num_epochs):
@@ -114,9 +114,9 @@ class SeeKerTrainer:
             print("Starting Epoch {} / {}".format(epoch + 1, num_epochs))
             pbar = tqdm(self.train_loader)
             for _, data_arr in enumerate(pbar):
-                print(data_arr[0].shape)
-                print(data_arr)
-                exit()
+                # print(data_arr[0].shape)
+                # print(data_arr)
+                # exit()
 
                 # Forward pass
                 x = torch.permute(data_arr[0], (0,2,3,1))[..., :2]
@@ -127,10 +127,6 @@ class SeeKerTrainer:
                 negloglik_loss = lnp.sum(-1).mean()
 
                 # Logging
-                auc, avg_precision, fpr_95 = self.validate()
-
-                min_loss = min(negloglik_loss.item(), min_loss)
-                max_auc = max(auc, max_auc)
 
                 # run.log({
                 #     "auc": auc,
@@ -159,6 +155,12 @@ class SeeKerTrainer:
             #     auc_val = 0
 
             # run.log({"auc": auc_val, "loss": negloglik_loss.item(), })
+
+            # Validating the model
+            auc, avg_precision, fpr_95 = self.validate()
+            max_auc = max(auc, max_auc)
+
+            print(f"Current AUC {auc}")
             
             # is_best = auc_val == max(all_val_auc.values(), default=0)
             is_best = max_auc <= auc
