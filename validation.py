@@ -52,9 +52,11 @@ def get_all_frame_scores(scores, metadata, args=None, split='test', sigma=0):
     if args.dataset == 'UBnormal':
         pose_segs_root = f'data/UBnormal/pose/{split}'
         clip_list = os.listdir(pose_segs_root)
-        clip_list = sorted(
-            fn.replace("alphapose_tracked_person.json", "tracks.txt") for fn in clip_list if fn.endswith('.json'))
-        per_frame_scores_root = f'data/UBnormal/gt/{split}/'
+        # clip_list = sorted(
+        #     fn.replace("alphapose_tracked_person.json", "tracks.txt") for fn in clip_list if fn.endswith('.json'))
+        # per_frame_scores_root = f'data/UBnormal/gt/{split}/'
+        clip_list = sorted(fn.replace("alphapose_tracked_person.json", "gt.npy") for fn in clip_list if fn.endswith('.json'))
+        per_frame_scores_root = f'data/UBnormal/gt/'
     elif args.dataset == 'avenue':
         per_frame_scores_root = f'/mnt/sdb1/adelic/datasets/avenue/ground_truth_demo/testing_label_mask/'
         clip_list = os.listdir(per_frame_scores_root)
@@ -116,7 +118,8 @@ def get_scores_in_clip(scores, clip, metadata_np, metadata, per_frame_scores_roo
             if np.any(gt[t] == 1):
                 clip_gt[t] = 1
     elif args.dataset == 'UBnormal':
-        clip_gt = 1 - np.load(clip_res_fn) # Because in file (1 = normal; 0 = abnormal)
+        # clip_gt = 1 - np.load(clip_res_fn) # Because in file (1 = normal; 0 = abnormal)
+        clip_gt = np.load(clip_res_fn) # Fix label (0 = normal; 1 = abnormal) 
     else:
         clip_gt = np.load(clip_res_fn)
 

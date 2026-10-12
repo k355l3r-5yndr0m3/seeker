@@ -32,6 +32,9 @@ class SkeletonSequenceDataset(Dataset):
         self.metadata = self.segs_meta
         self.num_samples, self.C, self.T, self.V = self.segs_data_np.shape
 
+        print(f'num_sample = {self.num_samples}; C = {self.C}; T = {self.T}; V = {self.V}')
+        exit()
+
     def __getitem__(self, index):
         sample_index = index
         data_transformed = np.array(self.segs_data_np[index])

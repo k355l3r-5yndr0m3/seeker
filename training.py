@@ -44,7 +44,7 @@ class SeeKerTrainer:
         filename = filename
         try:
             checkpoint = torch.load(filename)
-            self.start_epoch = checkpoint['epoch']
+            snelf.start_epoch = checkpoint['epoch']
             self.model.load_state_dict(checkpoint['state_dict'], strict=False)
             # self.model.set_actnorm_init()
             self.optimizer.load_state_dict(checkpoint['optimizer'])
@@ -96,14 +96,14 @@ class SeeKerTrainer:
         # exit()
 
         # start wandb run 
-        run = wandb.init(
-            entity="hoanghung17jan-vu-hoang-hung",
-            project="Project",
-            config={
-                "grouping": "Log every update, keep max and min",
-                **vars(self.args),
-            }
-        )
+        # run = wandb.init(
+        #     entity="hoanghung17jan-vu-hoang-hung",
+        #     project="Project",
+        #     config={
+        #         "grouping": "Log every update, keep max and min",
+        #         **vars(self.args),
+        #     }
+        # )
 
         min_loss = float('inf')
         max_auc = float('-inf')
@@ -114,6 +114,10 @@ class SeeKerTrainer:
             print("Starting Epoch {} / {}".format(epoch + 1, num_epochs))
             pbar = tqdm(self.train_loader)
             for _, data_arr in enumerate(pbar):
+                print(data_arr[0].shape)
+                print(data_arr)
+                exit()
+
                 # Forward pass
                 x = torch.permute(data_arr[0], (0,2,3,1))[..., :2]
                 x = x.to(self.args.device, non_blocking=True) 
@@ -128,14 +132,14 @@ class SeeKerTrainer:
                 min_loss = min(negloglik_loss.item(), min_loss)
                 max_auc = max(auc, max_auc)
 
-                run.log({
-                    "auc": auc,
-                    "average precision": avg_precision,
-                    "FPR@95": fpr_95,
-                    "loss": negloglik_loss.item(),
-                    'min_loss': min_loss,
-                    'max_auc': max_auc,
-                })
+                # run.log({
+                #     "auc": auc,
+                #     "average precision": avg_precision,
+                #     "FPR@95": fpr_95,
+                #     "loss": negloglik_loss.item(),
+                #     'min_loss': min_loss,
+                #     'max_auc': max_auc,
+                # })
 
                 # Optimizing
                 negloglik_loss.backward()
@@ -166,7 +170,7 @@ class SeeKerTrainer:
         if epoch > 0:
             run.log({ "auc": auc, "loss": negloglik_loss.item(), 'min_loss': min_loss, 'max_auc': max_auc, })
 
-        run.finish()
+        # run.finish()
 
         return auc_val
     

@@ -32,12 +32,20 @@ def main():
     pretrained = vars(args).get('checkpoint', None)
     dataset, loader = get_dataset_and_loader(args, only_test=(pretrained is not None))
 
+    for i in loader['train']:
+        print(i)
+        exit()
+
     in_dim = 2*18*args.seg_len
     model = PartialAutoregressiveFC(dim=in_dim, hidden_dims=args.n_layers*[args.expansion_factor*(in_dim-2)], droppout=args.droppout)
-    print(model)
+    # print(model)
     model.to('cuda')
     writer = SummaryWriter()
-    print(args.dataset)
+    # print(args.dataset)
+
+
+
+
     trainer = SeeKerTrainer(args, model, loader['train'], loader['test'], loader['validate'], 
                                            dataset['validate'].metadata, dataset['test'].metadata,
                       optimizer_f=init_optimizer(args.model_optimizer, lr=args.model_lr),
