@@ -22,6 +22,8 @@ class SeeKerTrainer:
         self.optimizer = optimizer_f(self.model.parameters())
         self.dataset = dataset
 
+        print(f"ckpt_dir = {args.ckpt_dira}")
+
     def gen_checkpoint_state(self, epoch):
         checkpoint_state = {'epoch': epoch + 1,
                             'state_dict': self.model.state_dict(),
