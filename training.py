@@ -243,8 +243,8 @@ class SeeKerTrainer:
         anomaly_scores_kp = probs.cpu().detach().numpy().squeeze().copy(order='C')
 
 
-        print("Check code")
-        exit() # TODO Handle this
+        # print("Check code")
+        # exit() # TODO Handle this
         
         return score_anomalies(anomaly_scores_kp, self.test_metadata, args=self.args, split='test', sigma=sigma)
 
