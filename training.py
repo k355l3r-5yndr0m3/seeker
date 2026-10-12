@@ -160,7 +160,7 @@ class SeeKerTrainer:
             auc, avg_precision, fpr_95 = self.validate()
             max_auc = max(auc, max_auc)
 
-            print(f"Current AUC {auc}")
+            print(f"Current AUC={auc} | AVG_PRECISION={avg_precision} | FPR95={fpr_95}")
             
             # is_best = auc_val == max(all_val_auc.values(), default=0)
             is_best = max_auc <= auc
