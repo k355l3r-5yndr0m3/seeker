@@ -63,8 +63,8 @@ def main():
         auc_val = trainer.train()
     else:
         trainer.load_checkpoint(pretrained)
-        auc_test = trainer.test()
-        print(f"auc_test = {auc_test}")
+        auc, avg_precision, fpr_95 = trainer.test()
+        print(f"auc={auc}; avg_precision={avg_precision}; fpr_95={fpr_95}")
 
 
 if __name__ == '__main__':
