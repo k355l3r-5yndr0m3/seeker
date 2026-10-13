@@ -94,7 +94,7 @@ def get_all_frame_scores(scores, metadata, args=None, split='test', sigma=0):
 
 def get_scores_in_clip(scores, clip, metadata_np, metadata, per_frame_scores_root, args, sigma=0):
     if args.dataset == 'UBnormal':
-        type, scene_id, clip_id = re.findall(r'(abnormal|normal)_scene_(\d+)_scenario(.*)_tracks.*', clip)[0]
+        type, scene_id, clip_id = re.findall(r'(abnormal|normal)_scene_(\d+)_scenario(.*)_gt.*', clip)[0]
         clip_id = type + "_" + clip_id
     elif args.dataset == 'avenue':
         clip_id = int(clip.split('_')[0])
