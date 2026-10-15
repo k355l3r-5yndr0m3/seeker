@@ -94,82 +94,70 @@ class SeeKerTrainer:
         self.model = self.model.to(self.args.device)
         all_val_auc = {}
 
-        # print(vars(self.args))
-        # exit()
-
-        # start wandb run 
-        # run = wandb.init(
-        #     entity="hoanghung17jan-vu-hoang-hung",
-        #     project="Project",
-        #     config={
-        #         "grouping": "Log every update, keep max and min",
-        #         **vars(self.args),
-        #     }
-        # )
-
-        # min_loss = float('inf')
-        max_auc = float('-inf')
-
-        for epoch in range(start_epoch, num_epochs):
-            self.model.train()
-
-            print("Starting Epoch {} / {}".format(epoch + 1, num_epochs))
-            pbar = tqdm(self.train_loader)
-            for _, data_arr in enumerate(pbar):
-                # print(data_arr[0].shape)
-                # print(data_arr)
-                # exit()
-
-                # Forward pass
-                x = torch.permute(data_arr[0], (0,2,3,1))[..., :2]
-                x = x.to(self.args.device, non_blocking=True) 
-                
-                lnp = self.joint_lnp(x.float())
-
-                negloglik_loss = lnp.sum(-1).mean()
-
-                # Logging
-
-                # run.log({
-                #     "auc": auc,
-                #     "average precision": avg_precision,
-                #     "FPR@95": fpr_95,
-                #     "loss": negloglik_loss.item(),
-                #     'min_loss': min_loss,
-                #     'max_auc': max_auc,
-                # })
-
-                # Optimizing
-                negloglik_loss.backward()
-                
-                torch.nn.utils.clip_grad_norm_(self.model.parameters(), clip)
-                self.optimizer.step()
-                self.optimizer.zero_grad()
-
-                pbar.set_description("Loss: {}".format(negloglik_loss.item()))
-
-            self.log_writer.add_scalar('NLL Loss', negloglik_loss.item(), epoch )
-
-            # if self.dataset not in ["ShanghaiTech-IGNORE", "MSAD"]: # NOTE: ShanghaiTech test set == val set
-            #     auc_val = self.validate()
-            #     all_val_auc[epoch] = auc_val
-            # else:
-            #     auc_val = 0
-
-            # run.log({"auc": auc_val, "loss": negloglik_loss.item(), })
-
-            # Validating the model
-            auc, avg_precision, fpr_95 = self.validate()
-            max_auc = max(auc, max_auc)
-
-            print(f"Current AUC={auc} | AVG_PRECISION={avg_precision} | FPR95={fpr_95}")
+        with wandb.init(entity="hoanghung17jan-vu-hoang-hung", project="Project") as run:
             
-            # is_best = auc_val == max(all_val_auc.values(), default=0)
-            is_best = max_auc <= auc
-            if is_best:
-                self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
+            for epoch in range(start_epoch, num_epochs):
+                self.model.train()
+            
+                print("Starting Epoch {} / {}".format(epoch + 1, num_epochs))
+                pbar = tqdm(self.train_loader)
+                for data_idx, data_arr in enumerate(pbar):
+                    # Forward pass
+                    x = torch.permute(data_arr[0], (0,2,3,1))[..., :2]
+                    x = x.to(self.args.device, non_blocking=True) 
+                    
+                    lnp = self.joint_lnp(x.float())
+            
+                    negloglik_loss = lnp.sum(-1).mean()
+            
+                    # Optimizing
+                    negloglik_loss.backward()
+                    
+                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), clip)
+                    self.optimizer.step()
+                    self.optimizer.zero_grad()
+            
+                    pbar.set_description("Loss: {}".format(negloglik_loss.item()))
+            
+                    # Validate model on validation set
+                    auroc, avg_precision, fpr_95 = self.validate()
 
-            # Foregoing saving
+                    # Logging via wandb
+                    run.log({
+                        "epoch": epoch,
+                        "batch": data_idx,
+
+                        "auroc": auroc,
+                        "average precision": avg_precision,
+                        "fpr 95": fpr_95,
+                        })
+
+                    # Logging via stdout
+                    print(f"{'=' * 64}\nauroc: {auroc}\naverage precision:{avg_precision}\nfpr 95: {fpr_95}")
+            
+            
+                self.log_writer.add_scalar('NLL Loss', negloglik_loss.item(), epoch )
+            
+                # if self.dataset not in ["ShanghaiTech-IGNORE", "MSAD"]: # NOTE: ShanghaiTech test set == val set
+                #     auc_val = self.validate()
+                #     all_val_auc[epoch] = auc_val
+                # else:
+                #     auc_val = 0
+            
+                # run.log({"auc": auc_val, "loss": negloglik_loss.item(), })
+            
+                # Validating the model
+                # auc, avg_precision, fpr_95 = self.validate()
+                # max_auc = max(auc, max_auc)
+                # 
+                # print(f"Current AUC={auc} | AVG_PRECISION={avg_precision} | FPR95={fpr_95}")
+                
+                # is_best = auc_val == max(all_val_auc.values(), default=0)
+                is_best = max_auc <= auc
+                if is_best:
+                    self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
+            
+                # Foregoing saving
 
         # Final log
         # if epoch > 0:

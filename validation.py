@@ -21,7 +21,7 @@ def score_anomalies(scores_kp, metadata, args=None, split='test', ret_gt=False, 
     #     return auc, scores_np, gt_np
     # return auc
 
-
+# NOTE: Not only AUROC but avg_precisiob, fpr_95
 def score_auc(scores_np, gt):
     scores_np[scores_np == np.inf] = scores_np[scores_np != np.inf].max() +1
     scores_np[scores_np == -1 * np.inf] = scores_np[scores_np != -1 * np.inf].min()-1
