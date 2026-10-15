@@ -127,13 +127,15 @@ class SeeKerTrainer:
                         "epoch": epoch,
                         "batch": data_idx,
 
+                        "loss": negloglik_loss.item(),
+
                         "auroc": auroc,
                         "average precision": avg_precision,
                         "fpr 95": fpr_95,
                         })
 
                     # Logging via stdout
-                    print(f"{'=' * 64}\nauroc: {auroc}\naverage precision:{avg_precision}\nfpr 95: {fpr_95}")
+                    print(f"{'=' * 64}\nauroc: {auroc}\naverage precision: {avg_precision}\nfpr 95: {fpr_95}\nloss: {negloglik_loss.item()}")
             
             
                 self.log_writer.add_scalar('NLL Loss', negloglik_loss.item(), epoch )
