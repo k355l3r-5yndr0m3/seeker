@@ -138,6 +138,11 @@ class SeeKerTrainer:
 
                     # Logging via stdout
                     print(f"{'=' * 64}\nauroc: {auroc}\naverage precision: {avg_precision}\nfpr 95: {fpr_95}\nloss: {negloglik_loss.item()}")
+
+                    # Saving checkpoint
+                    if max_auroc <= auroc:
+                        print("Saving checkpoint")
+                        self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
             
             
                 self.log_writer.add_scalar('NLL Loss', negloglik_loss.item(), epoch )
@@ -157,8 +162,8 @@ class SeeKerTrainer:
                 # print(f"Current AUC={auc} | AVG_PRECISION={avg_precision} | FPR95={fpr_95}")
                 
                 # is_best = auc_val == max(all_val_auc.values(), default=0)
-                if max_auroc <= auroc:
-                    self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
+                # if max_auroc <= auroc:
+                #     self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
             
                 # Foregoing saving
 
