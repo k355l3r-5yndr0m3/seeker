@@ -72,6 +72,7 @@ def get_dataset_and_loader(args, only_test=False):
         dataset_args['seg_stride'] = args.seg_stride if split == 'train' else 1  # No strides for test set
         dataset_args['vid_path'] = args.vid_path[split]
         dataset_args['split'] = split
+        print(f"X {splits}")
         dataset[split] = SkeletonSequenceDataset(args.pose_path[split], path_to_vid_dir=args.vid_path[split],
                                         evaluate=evaluate,
                                         filter_conf=args.filter_conf,
