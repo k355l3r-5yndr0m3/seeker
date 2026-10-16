@@ -57,6 +57,7 @@ class SkeletonSequenceDataset(Dataset):
 
 
 def get_dataset_and_loader(args, only_test=False):
+    print('A')
     loader_args = {'batch_size': args.batch_size, 'num_workers': args.num_workers, 'pin_memory': True}
     dataset_args = {'seg_len': args.seg_len, "dataset": args.dataset, 'train_seg_conf_th': args.train_seg_conf_th}
     dataset, loader = dict(), dict()
@@ -88,6 +89,7 @@ def get_dataset_and_loader(args, only_test=False):
     if args.dataset != 'UBnormal':
         dataset['validate'] = dataset['test']
         loader['validate'] = loader['test']
+    print('B')
     return dataset, loader
 
 
