@@ -66,7 +66,7 @@ def main():
         trainer.load_checkpoint(pretrained)
         auc, avg_precision, fpr_95 = trainer.test()
         with wandb.init(entity="hoanghung17jan-vu-hoang-hung", project="Project") as run: 
-            run.log({"test auroc": auc, "test average precision": avg_precision, "test fpr 95": fpr_95})
+            run.log({"auroc": auc, "average precision": avg_precision, "fpr 95": fpr_95})
 
 
 if __name__ == '__main__':
