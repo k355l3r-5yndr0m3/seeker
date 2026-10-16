@@ -10,6 +10,7 @@ from models.partial_autoregressive import PartialAutoregressiveFC
 from training import SeeKerTrainer
 from utils.training_utils import init_optimizer
 
+import wandb
 
 def main():
     parser = init_parser()
@@ -64,7 +65,8 @@ def main():
     else:
         trainer.load_checkpoint(pretrained)
         auc, avg_precision, fpr_95 = trainer.test()
-        print(f"auc={auc}; avg_precision={avg_precision}; fpr_95={fpr_95}")
+        with wandb.init(entity="hoanghung17jan-vu-hoang-hung", project="Project") as run: 
+            run.log({"test auroc": auc, "test average precision": avg_precision, "test fpr 95": fpr_95})
 
 
 if __name__ == '__main__':
