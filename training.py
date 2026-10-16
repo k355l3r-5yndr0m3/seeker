@@ -94,8 +94,9 @@ class SeeKerTrainer:
         self.model = self.model.to(self.args.device)
         all_val_auc = {}
 
+    
         with wandb.init(entity="hoanghung17jan-vu-hoang-hung", project="Project") as run:
-            
+            max_auroc = float('-inf')
             for epoch in range(start_epoch, num_epochs):
                 self.model.train()
             
@@ -121,6 +122,7 @@ class SeeKerTrainer:
             
                     # Validate model on validation set
                     auroc, avg_precision, fpr_95 = self.validate()
+                    max_auroc = max(auroc, max_auroc)
 
                     # Logging via wandb
                     run.log({
@@ -155,8 +157,7 @@ class SeeKerTrainer:
                 # print(f"Current AUC={auc} | AVG_PRECISION={avg_precision} | FPR95={fpr_95}")
                 
                 # is_best = auc_val == max(all_val_auc.values(), default=0)
-                is_best = max_auc <= auc
-                if is_best:
+                if max_auroc <= auroc:
                     self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
             
                 # Foregoing saving
