@@ -72,8 +72,11 @@ def get_all_frame_scores(scores, metadata, args=None, split='test', sigma=0):
 
     print("Scoring {} clips".format(len(clip_list)))
     for clip in tqdm(clip_list):
+
         clip_gt, clip_score = get_scores_in_clip(scores, clip, metadata_np, metadata, per_frame_scores_root, args, sigma=sigma)
         if clip_score is not None:
+            if args.dump_score is not None:
+                print(f"{clip} {clip_gt.tolist()} {clip_score.tolist()}", file=args.dump_score)
 
             dataset_gt_arr.append(clip_gt)
             dataset_scores_arr.append(clip_score)
@@ -141,11 +144,12 @@ def get_scores_in_clip(scores, clip, metadata_np, metadata, per_frame_scores_roo
         person_metadata_inds = \
             np.where(
                 (metadata_np[:, 1] == clip_id) & (metadata_np[:, 0] == scene_id) & (metadata_np[:, 2] == person_id))[0]
+
         pid_scores = scores[person_metadata_inds]
 
         if pid_scores.shape[0] < args.seg_len:
             continue
-        s_t_ = pid_scores.reshape((pid_scores.shape[0], args.seg_len, 18))[:, -1, :]
+        # s_t_ = pid_scores.reshape((pid_scores.shape[0], args.seg_len, 18))[:, -1, :]
         s_t = pid_scores.reshape((pid_scores.shape[0], args.seg_len, 18)).sum(-1)
         # frames where person is present in video
         pid_frame_inds = np.array([metadata[i][3] for i in person_metadata_inds]).astype(int) # first frames of segments

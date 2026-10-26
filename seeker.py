@@ -26,6 +26,11 @@ def main():
         torch.manual_seed(args.seed)
         np.random.seed(0)
 
+    
+    if args.dump_score is not None:
+        args.dump_score = open(args.dump_score, "w")
+
+
     print(-2)
     
     args, model_args = init_sub_args(args)
@@ -37,10 +42,6 @@ def main():
     dataset, loader = get_dataset_and_loader(args, only_test=(pretrained is not None))
 
     print(0)
-
-    # for i in loader['train']:
-    #     print(i)
-    #     exit()
 
     in_dim = 2*18*args.seg_len
     model = PartialAutoregressiveFC(dim=in_dim, hidden_dims=args.n_layers*[args.expansion_factor*(in_dim-2)], droppout=args.droppout)
@@ -66,8 +67,8 @@ def main():
         trainer.load_checkpoint(pretrained)
         auc, avg_precision, fpr_95 = trainer.test()
         print(f"auc = {auc}\navg_precision = {avg_precision}\nfpr_95 = {fpr_95}")
-        with wandb.init(entity="hoanghung17jan-vu-hoang-hung", project="Project") as run: 
-            run.log({"auroc": auc, "average precision": avg_precision, "fpr 95": fpr_95})
+        # with wandb.init(entity="hoanghung17jan-vu-hoang-hung", project="Project") as run: 
+        #     run.log({"auroc": auc, "average precision": avg_precision, "fpr 95": fpr_95})
 
 
 if __name__ == '__main__':

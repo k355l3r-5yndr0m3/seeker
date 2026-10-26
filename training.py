@@ -249,6 +249,7 @@ class SeeKerTrainer:
                 # lnp = self.joint_lnp_full_window(x.float()) # NOTE: does not exist. What the fuck is with this code? 
                 lnp = self.joint_lnp(x.float())
 
+                # NOTE: This contradict the paper
                 pad = torch.randn(B, (T-1)*N).to(self.args.device)
                 nll = torch.cat((pad, lnp), dim=1)
                 nll = nll.view(B, T,  N) * conf.cuda()
@@ -257,10 +258,11 @@ class SeeKerTrainer:
             probs = torch.cat((probs, nll), dim=0) # nll is the anomaly score
         anomaly_scores_kp = probs.cpu().detach().numpy().squeeze().copy(order='C')
 
+        # print(anomaly_scores_kp.shape)
+        # exit()
 
         # print("Check code")
         # exit() # TODO Handle this
-        
         return score_anomalies(anomaly_scores_kp, self.test_metadata, args=self.args, split='test', sigma=sigma)
 
         # print("AUC on test forward:", auc)

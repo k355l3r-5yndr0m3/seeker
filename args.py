@@ -218,6 +218,11 @@ def init_parser(default_data_dir="./data", default_exp_dir="./exp_dir"):
         "--expansion_factor", type=int, default=1, help="expansion factor"
     )
 
+    # For inference
+    parser.add_argument(
+        "--dump_score", type=str, default=None, help="where to write the score/gt/clip name to (maybe not that order)"
+    )
+
     return parser
 
 
