@@ -164,7 +164,7 @@ def get_scores_in_clip(scores, clip, metadata_np, metadata, per_frame_scores_roo
 
     if args.dump_score is not None:
         data = {"clip_id": clip, "clip_gt": clip_gt, "scores": clip_person_scores_dict,}
-        print(str(base64.b64encode(pickle.dumps(data))), file=args.dump_score)
+        print(base64.b64encode(pickle.dumps(data)).decode('utf-8'), file=args.dump_score)
 
 
     clip_ppl_score_arr = np.stack(list(clip_person_scores_dict.values()))
