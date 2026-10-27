@@ -12,7 +12,7 @@ from utils.data_utils import shanghaitech_hr_skip
 
 def score_anomalies(scores_kp, metadata, args=None, split='test', ret_gt=False, sigma=0):
     gt_arr, scores_arr = get_all_frame_scores(scores_kp, metadata, args=args, split=split, sigma=sigma)
-    scores_arr = smooth_scores(scores_arr, 2)
+    scores_arr = smooth_scores(scores_arr, 2) # NOTE: This constradict the paper
     gt_np = np.concatenate(gt_arr)
     scores_np = np.concatenate(scores_arr)
 
@@ -76,7 +76,7 @@ def get_all_frame_scores(scores, metadata, args=None, split='test', sigma=0):
         clip_gt, clip_score = get_scores_in_clip(scores, clip, metadata_np, metadata, per_frame_scores_root, args, sigma=sigma)
         if clip_score is not None:
             if args.dump_score is not None:
-                print(f"{clip} {clip_gt.tolist()} {clip_score.tolist()}", file=args.dump_score)
+                print(f"{clip} | {clip_gt.tolist()} | {clip_score.tolist()}", file=args.dump_score) # Add | as delimiter 
 
             dataset_gt_arr.append(clip_gt)
             dataset_scores_arr.append(clip_score)
