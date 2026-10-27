@@ -1,4 +1,7 @@
 import os
+import pickle
+import base64
+
 import numpy as np
 from tqdm import tqdm
 import re
@@ -33,11 +36,11 @@ def score_auc(scores_np, gt):
     idx = (tpr >= target_tpr).argmax()
     fpr_at_target_tpr = fpr[idx]
     threshold_at_target_tpr = thresholds[idx]
-    print("FPR@95: ", fpr_at_target_tpr)
+    # print("FPR@95: ", fpr_at_target_tpr)
 
     # calculate average precision
     avg_precision = average_precision_score(gt, scores_np)
-    print("Average Precision: ", avg_precision)
+    # print("Average Precision: ", avg_precision)
 
     # print("Threshold@TPR=95%: ", threshold_at_target_tpr)
     return auc, avg_precision, fpr_at_target_tpr
@@ -75,8 +78,8 @@ def get_all_frame_scores(scores, metadata, args=None, split='test', sigma=0):
 
         clip_gt, clip_score = get_scores_in_clip(scores, clip, metadata_np, metadata, per_frame_scores_root, args, sigma=sigma)
         if clip_score is not None:
-            if args.dump_score is not None:
-                print(f"{clip} | {clip_gt.tolist()} | {clip_score.tolist()}", file=args.dump_score) # Add | as delimiter 
+            # if args.dump_score is not None:
+            #     print(f"{clip} | {clip_gt.tolist()} | {clip_score.tolist()}", file=args.dump_score) # Add | as delimiter 
 
             dataset_gt_arr.append(clip_gt)
             dataset_scores_arr.append(clip_score)
@@ -158,6 +161,11 @@ def get_scores_in_clip(scores, clip, metadata_np, metadata, per_frame_scores_roo
 
         clip_person_scores_dict[person_id][pid_frame_inds_] = s
         # clip_kp_person_scores_dict[person_id][pid_frame_inds] = s_t_
+
+    if args.dump_score is not None:
+        data = {"clip_id": clip, "clip_gt": clip_gt, "scores": clip_person_scores_dict,}
+        print(str(base64.b64encode(pickle.dumps(data))), file=args.dump_score)
+
 
     clip_ppl_score_arr = np.stack(list(clip_person_scores_dict.values()))
     clip_score = np.amax(clip_ppl_score_arr, axis=0)
