@@ -128,11 +128,15 @@ class SeeKerTrainer:
                     run.log({
                         "epoch": epoch,
 
-                        "loss": negloglik_loss.item(),
+                    #    "loss": negloglik_loss.item(), # Doesn't make any sense anymore
 
                         "val_auroc": val_auroc, "val_avg_precision": val_avg_precision, "val_fpr95": val_fpr95,
                     #     "test_auroc": test_auroc, "test_avg_precision": test_avg_precision, "test_fpr95": test_fpr95,
                     })
+
+                    print(f"epoch={epoch} val_auroc={val_auroc} val_avg_precision={val_avg_precision} val_fpr95={val_fpr95}")
+
+
 
                 # Saving checkpoint
                 max_auroc = max(max_auroc, val_auroc)

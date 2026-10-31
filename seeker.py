@@ -66,7 +66,7 @@ def main():
     else:
         trainer.load_checkpoint(pretrained)
         auc, avg_precision, fpr_95 = trainer.test()
-        print(f"auc = {auc}\navg_precision = {avg_precision}\nfpr_95 = {fpr_95}")
+        print(f"test_auc = {auc} test_avg_precision = {avg_precision} test_fpr_95 = {fpr_95}")
         # with wandb.init(entity="hoanghung17jan-vu-hoang-hung", project="Project") as run: 
         #     run.log({"auroc": auc, "average precision": avg_precision, "fpr 95": fpr_95})
 
