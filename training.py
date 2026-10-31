@@ -136,13 +136,11 @@ class SeeKerTrainer:
 
                     print(f"epoch={epoch} val_auroc={val_auroc} val_avg_precision={val_avg_precision} val_fpr95={val_fpr95}")
 
-
-
-                # Saving checkpoint
-                max_auroc = max(max_auroc, val_auroc)
-                if max_auroc <= val_auroc:
-                    print("Saving checkpoint")
-                    self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
+                    # Saving checkpoint
+                    max_auroc = max(max_auroc, val_auroc)
+                    if max_auroc <= val_auroc:
+                        print("Saving checkpoint")
+                        self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
             
             
                 # self.log_writer.add_scalar('NLL Loss', negloglik_loss.item(), epoch)
