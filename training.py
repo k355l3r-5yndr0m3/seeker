@@ -119,49 +119,29 @@ class SeeKerTrainer:
                     self.optimizer.zero_grad()
             
                     pbar.set_description("Loss: {}".format(negloglik_loss.item()))
-            
-                    # Validate model on validation set
-                    # auroc, avg_precision, fpr_95 = self.validate()
-                    # max_auroc = max(auroc, max_auroc)
-                    # 
-                    # # Logging via wandb
-                    # run.log({
-                    #     "epoch": epoch,
-                    #     "batch": data_idx,
-                    # 
-                    #     "loss": negloglik_loss.item(),
-                    # 
-                    #     "auroc": auroc,
-                    #     "average precision": avg_precision,
-                    #     "fpr 95": fpr_95,
-                    #     })
-                    # 
-                    # # Logging via stdout
-                    # print(f"{'=' * 64}\nauroc: {auroc}\naverage precision: {avg_precision}\nfpr 95: {fpr_95}\nloss: {negloglik_loss.item()}")
 
-                    # Compute metrics on validation and test set
-                    with torch.inference_mode():
-                        val_auroc, val_avg_precision, val_fpr95 = self.validate()
-                        test_auroc, test_avg_precision, test_fpr95 = self.test()
+                # Compute metrics on validation set (for each epoch)
+                with torch.inference_mode():
+                    val_auroc, val_avg_precision, val_fpr95 = self.validate()
+                    # test_auroc, test_avg_precision, test_fpr95 = self.test()
 
-                        run.log({
-                            "epoch": epoch,
-                            "batch": data_idx,
+                    run.log({
+                        "epoch": epoch,
 
-                            "loss": negloglik_loss.item(),
+                        "loss": negloglik_loss.item(),
 
-                            "val_auroc": val_auroc, "val_avg_precision": val_avg_precision, "val_fpr95": val_fpr95,
-                            "test_auroc": test_auroc, "test_avg_precision": test_avg_precision, "test_fpr95": test_fpr95,
-                            })
+                        "val_auroc": val_auroc, "val_avg_precision": val_avg_precision, "val_fpr95": val_fpr95,
+                    #     "test_auroc": test_auroc, "test_avg_precision": test_avg_precision, "test_fpr95": test_fpr95,
+                    })
 
-                    # Saving checkpoint
-                    max_auroc = max(max_auroc, val_auroc)
-                    if max_auroc <= val_auroc:
-                        print("Saving checkpoint")
-                        self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
+                # Saving checkpoint
+                max_auroc = max(max_auroc, val_auroc)
+                if max_auroc <= val_auroc:
+                    print("Saving checkpoint")
+                    self.save_checkpoint(epoch=epoch, filename="checkpoint_best.pth")
             
             
-                self.log_writer.add_scalar('NLL Loss', negloglik_loss.item(), epoch )
+                # self.log_writer.add_scalar('NLL Loss', negloglik_loss.item(), epoch)
             
                 # if self.dataset not in ["ShanghaiTech-IGNORE", "MSAD"]: # NOTE: ShanghaiTech test set == val set
                 #     auc_val = self.validate()

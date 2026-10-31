@@ -1,7 +1,7 @@
 import random
 import numpy as np
 import torch
-from torch.utils.tensorboard import SummaryWriter
+# from torch.utils.tensorboard import SummaryWriter
 from args import create_exp_dirs
 from args import init_parser, init_sub_args
 from dataset import get_dataset_and_loader
@@ -45,9 +45,9 @@ def main():
 
     in_dim = 2*18*args.seg_len
     model = PartialAutoregressiveFC(dim=in_dim, hidden_dims=args.n_layers*[args.expansion_factor*(in_dim-2)], droppout=args.droppout)
-    # print(model)
+    print(model)
     model.to('cuda')
-    writer = SummaryWriter()
+    writer = None # SummaryWriter()
     # print(args.dataset)
 
     print(1)
